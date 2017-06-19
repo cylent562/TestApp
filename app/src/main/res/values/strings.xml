@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">TestApp</string>
+    <string name="app_name">TEST</string>
+    <string name="title_activity_main2">Main2Activity</string>
+    <string name="add_tab">Add</string>
+    <string name="box_tab">Collection</string>
+    <string name="sort_btn">Sort</string>
 </resources>
