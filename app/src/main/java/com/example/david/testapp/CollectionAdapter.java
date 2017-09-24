@@ -1,13 +1,18 @@
 package com.example.david.testapp;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.View.OnClickListener;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -34,7 +39,8 @@ public class CollectionAdapter extends BaseAdapter{
     // 3
     @Override
     public long getItemId(int position) {
-        return 0;
+        Collection collection = collections.get(position);
+        return collection.getId();
     }
 
     // 4
@@ -54,7 +60,6 @@ public class CollectionAdapter extends BaseAdapter{
         }
 
         final ImageView imageView = (ImageView)convertView.findViewById(R.id.imageview_portrait);
-        //final TextView nameTextView = (TextView)convertView.findViewById(R.id.textview_hero_name);
         final ImageView imageViewFavorite = (ImageView)convertView.findViewById(R.id.imageview_rarity);
 
         imageView.setImageResource(collection.getImageResource());

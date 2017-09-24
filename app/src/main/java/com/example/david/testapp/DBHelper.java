@@ -20,6 +20,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String HEROES_COLUMN_ID = "id";
     public static final String HEROES_COLUMN_NAME = "name";
     public static final String HEROES_COLUMN_RARITY = "rarity";
+    public static final String HEROES_COLUMN_FILENAME = "filename";
 
     private HashMap hp;
 
@@ -31,7 +32,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(
                 "create table heroes " +
-                        "(id integer primary key, name text,rarity integer)"
+                        "(id integer primary key, name text,rarity integer, filename text)"
         );
     }
 
@@ -41,11 +42,12 @@ public class DBHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public boolean insertHero (String name, Integer rarity) {
+    public boolean insertHero (Data d) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        contentValues.put("name", name);
-        contentValues.put("rarity", rarity);
+        contentValues.put("name", d.getName());
+        contentValues.put("rarity", d.getRarity());
+        contentValues.put("filename", d.getFilename());
         db.insert("heroes", null, contentValues);
         return true;
     }
@@ -66,9 +68,30 @@ public class DBHelper extends SQLiteOpenHelper {
                 new String[] { Integer.toString(id) });
     }
 
+    public Data getHeroDataById(int id) {
+        Data d = null;
+        String name = "";
+        String filename = "";
+        int rarity = -1;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res =  db.rawQuery( "select * from heroes where id="+id, null );
+        res.moveToFirst();
+        while(res.isAfterLast() == false){
+            name = res.getString(res.getColumnIndex(HEROES_COLUMN_NAME));
+            rarity = res.getInt(res.getColumnIndex(HEROES_COLUMN_RARITY));
+            filename = res.getString(res.getColumnIndex(HEROES_COLUMN_FILENAME));
+            d = new Data(id, name, rarity, filename);
+            res.moveToNext();
+        }
+        return d;
+    }
+
+
     public ArrayList<Data> getAllHeroes() {
         ArrayList<Data> array_list = new ArrayList<>();
         String name = "";
+        String filename = "";
         int rarity = -1;
         int id = -1;
 
@@ -81,7 +104,8 @@ public class DBHelper extends SQLiteOpenHelper {
             name = res.getString(res.getColumnIndex(HEROES_COLUMN_NAME));
             rarity = res.getInt(res.getColumnIndex(HEROES_COLUMN_RARITY));
             id = res.getInt(res.getColumnIndex(HEROES_COLUMN_ID));
-            array_list.add(new Data(id, name, rarity));
+            filename = res.getString(res.getColumnIndex(HEROES_COLUMN_FILENAME));
+            array_list.add(new Data(id, name, rarity, filename));
             res.moveToNext();
         }
         return array_list;

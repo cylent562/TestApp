@@ -11,6 +11,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.JsonReader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,8 +22,17 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.*;
+
+import java.io.BufferedReader;
+import java.io.FileDescriptor;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -36,12 +46,31 @@ public class Main2Activity extends AppCompatActivity {
 
     public static String PACKAGE_NAME;
 
+    public static ArrayList<String> HEROES = new ArrayList<String>();
+    public static JSONObject HERO_DATA = new JSONObject();
+    public static String inheritable_skills;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Log.d(TAG, "onCreate: Starting.");
         PACKAGE_NAME = getApplicationContext().getPackageName();
+
+        //check server
+        try {
+            if (server_validation()) {
+                JSONObject hero_obj = new JSONObject(loadJSONFromAsset("hero_dump.txt"));
+                HERO_DATA = hero_obj;
+                for (Iterator<String> iterator = hero_obj.keys(); iterator.hasNext();) {
+                    String key = iterator.next();
+                    HEROES.add(key);
+                }
+                inheritable_skills = loadJSONFromAsset("skill_dump.txt");
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
 
         mSectionsPageAdapter = new SectionsPageAdapter(getSupportFragmentManager());
 
@@ -53,11 +82,32 @@ public class Main2Activity extends AppCompatActivity {
         tabLayout.setupWithViewPager(mViewPager);
     }
 
+    private boolean server_validation(){
+        return true;
+    }
+
+    public String loadJSONFromAsset(String filename) {
+        String json = null;
+        try {
+            //BufferedReader br = new BufferedReader(new InputStreamReader(getAssets().open("feh_dump.txt")));
+            InputStream is = getAssets().open(filename);
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            json = new String(buffer, "UTF-8");
+        } catch(Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        return json;
+    }
+
     private void setupViewPager(final ViewPager viewPager) {
         SectionsPageAdapter adapter = new SectionsPageAdapter(getSupportFragmentManager());
-        adapter.addFragment(new Tab1Fragment(), "Add");
-        adapter.addFragment(new Tab2Fragment(), "Collection");
-        adapter.addFragment(new Tab3Fragment(), "TAB3");
+        adapter.addFragment(new Tab1Fragment(), "Tab1Fragment");
+        adapter.addFragment(new Tab2Fragment(), "Tab2Fragment");
+        adapter.addFragment(new Tab3Fragment(), "Tab3Fragment");
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -68,6 +118,8 @@ public class Main2Activity extends AppCompatActivity {
             public void onPageSelected(int position) {
                 //SectionsPageAdapter mAdapter = new SectionsPageAdapter(getSupportFragmentManager());
                 //Fragment frag = mAdapter.getFragment(position);
+
+                //On Collection page, make DB call to refresh collection.
                 if (position == 1) {
                     DBHelper mydb;
                     ArrayList<Collection> collections;
@@ -78,16 +130,16 @@ public class Main2Activity extends AppCompatActivity {
                     collections = new ArrayList<>();
 
                     for (Data d : arr){
-                        String str = d.getName().toLowerCase().replaceAll("[( ]", "_").replaceAll("[')]", "");
-                        int image_id = getResources().getIdentifier(PACKAGE_NAME+":drawable/" + str, null, null);
-                        str = "rarity_" + String.valueOf(d.getRarity());
+                        //String str = d.getName().toLowerCase().replaceAll("[ ]", "_").replaceAll("[')(]", "");
+                        int image_id = getResources().getIdentifier(PACKAGE_NAME+":drawable/" + d.getFilename(), null, null);
+                        String str = "rarity_" + String.valueOf(d.getRarity());
                         int rarity_id = getResources().getIdentifier(PACKAGE_NAME+":drawable/" + str, null, null);
                         collections.add(new Collection(d.getId(), d.getName(), image_id, d.getRarity(), rarity_id));
                     }
 
                     Tab2Fragment tab2 = new Tab2Fragment();
                     tab2.updateFragment(collections, viewPager);
-                    Toast.makeText(viewPager.getContext(),PACKAGE_NAME,Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(viewPager.getContext(),PACKAGE_NAME,Toast.LENGTH_SHORT).show();
                     //Toast.makeText(viewPager.getContext(),"LOL",Toast.LENGTH_SHORT).show();
                 }
             }
@@ -98,6 +150,7 @@ public class Main2Activity extends AppCompatActivity {
         });
     }
 
+    //Setups Fragment, don't change.
     private class SectionsPageAdapter extends FragmentPagerAdapter {
 
         private final List<Fragment> mFragmentList = new ArrayList<>();

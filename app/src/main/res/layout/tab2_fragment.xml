@@ -1,24 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/CollectionFragment">
 
-    <TextView
-        android:id="@+id/textTab2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="40dp"
-        android:hint="@string/box_tab"
-        android:textSize="25sp" />
-
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/btnTEST2"
-        android:text="TESTBTN 2"/>
+        android:text="Sort"
+        android:layout_alignBaseline="@+id/button"
+        android:layout_alignBottom="@+id/button"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="200dp"
+        android:text="Delete" />
 
     <GridView
         android:id="@+id/gridview"
@@ -30,9 +36,19 @@
         android:verticalSpacing="10dp"
         android:horizontalSpacing="1dp"
         android:stretchMode="spacingWidthUniform"
-        android:layout_below="@+id/textTab2"
+        android:layout_marginTop="0dp"
+        android:layout_below="@+id/btnTEST2"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="147dp" />
+        android:layout_alignParentStart="true" />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/image_hero_action"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/btnTEST2"
+        android:src="@drawable/ike"
+        app:civ_border_width="2dp"
+        app:civ_border_color="#FF000000"/>
+
 
 </RelativeLayout>

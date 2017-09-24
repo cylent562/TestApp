@@ -2,47 +2,414 @@
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginLeft="4dp"
     android:paddingTop="16dp">
 
-    <LinearLayout
+
+    <!-- Start of tableLayout -->
+    <TableLayout
+        android:id="@+id/tableLayout"
+        android:layout_width="match_parent"
+        android:layout_height="135dp"
+        android:layout_below="@+id/skillLayout"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:paddingRight="5dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:layout_gravity="center"
+        android:background="@drawable/border">
+
+        <TableRow
+            android:layout_height="0dp"
+            android:layout_width="match_parent"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_height="30dp"
+                android:layout_width="0dp"
+                android:layout_weight=".2"
+                android:layout_gravity="center_vertical"
+                android:text="HP  "
+                android:textAlignment="center"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/hp_max"
+                android:layout_height="30dp"
+                android:layout_width="0dp"
+                android:layout_weight=".1"
+                android:layout_gravity="center_vertical"
+                android:text="44"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <Spinner
+                android:id="@+id/spinner_hp"
+                android:layout_height="30dp"
+                android:layout_width="0dp"
+                android:layout_weight=".7"
+                android:layout_gravity="center_vertical"
+                android:background="@null"
+                android:paddingLeft="4dp" />
+        </TableRow>
+
+        <TableRow
+            android:layout_height="0dp"
+            android:layout_width="match_parent"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_height="30dp"
+                android:layout_width="0dp"
+                android:layout_weight=".2"
+                android:layout_gravity="center_vertical"
+                android:textAlignment="center"
+                android:text="ATK"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/atk_max"
+                android:layout_height="30dp"
+                android:layout_width="0dp"
+                android:layout_weight=".1"
+                android:layout_gravity="center_vertical"
+                android:text="44"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <Spinner
+                android:id="@+id/spinner_atk"
+                android:layout_height="30dp"
+                android:layout_width="0dp"
+                android:layout_weight=".2"
+                android:layout_gravity="center"
+                android:background="@null" />
+
+            <TextView
+                android:layout_height="30dp"
+                android:layout_width="0dp"
+                android:layout_weight=".2"
+                android:layout_gravity="center_vertical"
+                android:textAlignment="center"
+                android:text="SPD"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/spd_max"
+                android:layout_height="30dp"
+                android:layout_width="0dp"
+                android:layout_weight=".1"
+                android:layout_gravity="center_vertical"
+                android:text="44"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <Spinner
+                android:id="@+id/spinner_spd"
+                android:layout_height="30dp"
+                android:layout_width="0dp"
+                android:layout_weight=".2"
+                android:layout_gravity="center_vertical"
+                android:background="@null"/>
+        </TableRow>
+
+        <TableRow
+            android:layout_height="0dp"
+            android:layout_width="match_parent"
+            android:layout_weight="1">
+
+            <TextView
+                android:layout_height="30dp"
+                android:layout_width="0dp"
+                android:layout_weight=".2"
+                android:layout_gravity="center_vertical"
+                android:textAlignment="center"
+                android:text="DEF"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/def_max"
+                android:layout_height="30dp"
+                android:layout_width="0dp"
+                android:layout_weight=".1"
+                android:layout_gravity="center_vertical"
+                android:text="44"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <Spinner
+                android:id="@+id/spinner_def"
+                android:layout_height="30dp"
+                android:layout_width="0dp"
+                android:layout_weight=".2"
+                android:layout_gravity="center_vertical"
+                android:background="@null" />
+
+            <TextView
+                android:layout_height="30dp"
+                android:layout_width="0dp"
+                android:layout_weight=".2"
+                android:layout_gravity="center_vertical"
+                android:textAlignment="center"
+                android:text="RES"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/res_max"
+                android:layout_height="30dp"
+                android:layout_width="0dp"
+                android:layout_weight=".1"
+                android:layout_gravity="center_vertical"
+                android:text="44"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <Spinner
+                android:id="@+id/spinner_res"
+                android:layout_height="30dp"
+                android:layout_width="0dp"
+                android:layout_weight=".2"
+                android:layout_gravity="center_vertical"
+                android:background="@null" />
+        </TableRow>
+    </TableLayout>
+
+    <TableLayout
+        android:id="@+id/skillLayout"
+        android:layout_width="match_parent"
+        android:layout_height="110dp"
+        android:layout_centerHorizontal="true"
+        android:paddingRight="5dp"
+        android:layout_gravity="center">
+        <TableRow
+            android:layout_height="0dp"
+            android:layout_width="match_parent"
+            android:layout_weight="1">
+
+            <ImageView
+                android:id="@+id/icon_weapon"
+                android:layout_height="25dp"
+                android:layout_width="0dp"
+                android:layout_weight=".15"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/weapon" />
+
+            <TextView
+                android:id="@+id/icon_weapon_name"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight=".35"
+                android:layout_gravity="center_vertical"
+                android:ellipsize="none"
+                android:scrollHorizontally="false"
+                android:text="Brave Weapon +"
+                android:textColor="#000000" />
+
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/icon_passiveA"
+                android:layout_height="25dp"
+                android:layout_width="0dp"
+                android:layout_weight=".15"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/daggerbreaker_3"/>
+
+            <TextView
+                android:id="@+id/icon_passiveA_name"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight=".35"
+                android:layout_gravity="center_vertical"
+                android:ellipsize="none"
+                android:scrollHorizontally="false"
+                android:text="Fury 3"
+                android:textColor="#000000" />
+        </TableRow>
+
+        <TableRow
+            android:layout_height="0dp"
+            android:layout_width="match_parent"
+            android:layout_weight="1">
+
+            <ImageView
+                android:id="@+id/icon_assist"
+                android:layout_height="25dp"
+                android:layout_width="0dp"
+                android:layout_weight=".15"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/shield" />
+
+            <TextView
+                android:id="@+id/icon_assist_name"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight=".35"
+                android:layout_gravity="center_vertical"
+                android:ellipsize="none"
+                android:text="Draw Back / Rally Attack"
+                android:textColor="#000000" />
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/icon_passiveB"
+                android:layout_width="0dp"
+                android:layout_height="25dp"
+                android:layout_gravity="center_vertical"
+                android:layout_weight=".15"
+                android:src="@drawable/water_boost_3" />
+
+            <TextView
+                android:id="@+id/icon_passiveB_name"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight=".35"
+                android:layout_gravity="center_vertical"
+                android:ellipsize="none"
+                android:scrollHorizontally="false"
+                android:text="Boerce's Blessign"
+                android:textColor="#000000" />
+        </TableRow>
+
+        <TableRow
+            android:layout_height="0dp"
+            android:layout_width="match_parent"
+            android:layout_weight="1">
+
+            <ImageView
+                android:id="@+id/icon_special"
+                android:layout_height="25dp"
+                android:layout_width="0dp"
+                android:layout_weight=".15"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/special" />
+
+            <TextView
+                android:id="@+id/icon_special_name"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight=".35"
+                android:layout_gravity="center_vertical"
+                android:ellipsize="none"
+                android:scrollHorizontally="false"
+                android:text="Aether Luna"
+                android:textColor="#000000" />
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/icon_passiveC"
+                android:layout_height="25dp"
+                android:layout_width="0dp"
+                android:layout_weight=".15"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/panic_ploy_3"/>
+
+            <TextView
+                android:id="@+id/icon_passiveC_name"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight=".35"
+                android:layout_gravity="center_vertical"
+                android:ellipsize="none"
+                android:scrollHorizontally="false"
+                android:text="Aether Luna"
+                android:textColor="#000000" />
+        </TableRow>
+    </TableLayout>
+
+    <ImageView
+        android:id="@+id/icon_weapon_type"
+        android:layout_height="30dp"
+        android:layout_width="0dp"
+        android:layout_weight=".2"
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/icon_class_blue_lance" />
+
+    <ImageView
+        android:id="@+id/icon_move"
+        android:layout_height="30dp"
+        android:layout_width="0dp"
+        android:layout_weight=".2"
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/icon_move_cavalry" />
+
+    <Spinner
+        android:layout_marginTop="5dp"
+        android:id="@+id/spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:layout_editor_absoluteY="0dp"
-        tools:layout_editor_absoluteX="8dp"
-        android:id="@+id/linearLayout">
+        android:layout_below="@+id/tableLayout"
+        android:layout_alignLeft="@+id/spinner2"
+        android:layout_alignStart="@+id/spinner2" />
 
-        <Spinner
-            android:layout_weight="1"
-            android:id="@+id/spinner"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"/>
+    <Spinner
+        android:layout_marginTop="5dp"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/spinner2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/spinner" />
 
-        <Spinner
-            android:id="@+id/spinner2"
+    <LinearLayout
+        android:id="@+id/hero_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/spinner2"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:background="@drawable/border">
+
+        <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/spinner"
-            android:layout_weight="1" />
+            android:layout_weight=".25"
+            android:gravity="center"
+            android:scrollHorizontally="false"
+            android:text="Tier:"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/hero_tier"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".25"
+            android:scrollHorizontally="false"
+            android:text="S+"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".25"
+            android:gravity="center"
+            android:scrollHorizontally="false"
+            android:text="Rating:"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/hero_rating"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".25"
+            android:scrollHorizontally="false"
+            android:text="162"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
     </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/floatingActionButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="28dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="20dp"
         android:clickable="true"
         app:fabSize="normal"
         app:srcCompat="@android:drawable/ic_input_add"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginRight="57dp"
-        android:layout_marginEnd="57dp" />
-
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

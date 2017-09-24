@@ -11,17 +11,20 @@ public class Data {
 
     private int id;
     private String name;
+    private String filename;
     private int rarity;
 
-    public Data(int id, String name, int rarity) {
+    public Data(int id, String name, int rarity, String filename) {
         this.id = id;
         this.name = name;
+        this.filename = filename;
         this.rarity = rarity;
     }
 
     public String getName(){ return this.name;}
     public int getRarity(){return this.rarity;}
     public int getId() { return this.id;}
+    public String getFilename() {return this.filename;}
 }
 
 /*
