@@ -33,6 +33,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -46,9 +47,9 @@ public class Main2Activity extends AppCompatActivity {
 
     public static String PACKAGE_NAME;
 
-    public static ArrayList<String> HEROES = new ArrayList<String>();
+    public static List<String> HEROES = new ArrayList<>();
     public static JSONObject HERO_DATA = new JSONObject();
-    public static String inheritable_skills;
+    public static JSONObject SKILL_DATA = new JSONObject();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,19 +61,21 @@ public class Main2Activity extends AppCompatActivity {
         //check server
         try {
             if (server_validation()) {
-                JSONObject hero_obj = new JSONObject(loadJSONFromAsset("hero_dump.txt"));
-                HERO_DATA = hero_obj;
-                for (Iterator<String> iterator = hero_obj.keys(); iterator.hasNext();) {
+                HERO_DATA = new JSONObject(loadJSONFromAsset("hero_dump.txt"));
+                for (Iterator<String> iterator = HERO_DATA.keys(); iterator.hasNext();) {
                     String key = iterator.next();
                     HEROES.add(key);
                 }
-                inheritable_skills = loadJSONFromAsset("skill_dump.txt");
+                SKILL_DATA = new JSONObject(loadJSONFromAsset("inheritable_skill_dump.txt"));
             }
         } catch(Exception e) {
             e.printStackTrace();
         }
 
         mSectionsPageAdapter = new SectionsPageAdapter(getSupportFragmentManager());
+
+        DBHelper d;
+        d = new DBHelper(this);
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
@@ -105,10 +108,11 @@ public class Main2Activity extends AppCompatActivity {
 
     private void setupViewPager(final ViewPager viewPager) {
         SectionsPageAdapter adapter = new SectionsPageAdapter(getSupportFragmentManager());
-        adapter.addFragment(new Tab1Fragment(), "Tab1Fragment");
-        adapter.addFragment(new Tab2Fragment(), "Tab2Fragment");
-        adapter.addFragment(new Tab3Fragment(), "Tab3Fragment");
+        adapter.addFragment(new Tab1Fragment(), "Add");
+        adapter.addFragment(new Tab2Fragment(), "Collection");
+        adapter.addFragment(new Tab3Fragment(), "Overview");
         viewPager.setAdapter(adapter);
+        viewPager.setOffscreenPageLimit(4);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -121,26 +125,16 @@ public class Main2Activity extends AppCompatActivity {
 
                 //On Collection page, make DB call to refresh collection.
                 if (position == 1) {
-                    DBHelper mydb;
-                    ArrayList<Collection> collections;
-
-                    mydb = new DBHelper(viewPager.getContext());
-                    ArrayList<Data> arr = mydb.getAllHeroes();
-                    StringBuilder sb  = new StringBuilder();
-                    collections = new ArrayList<>();
-
-                    for (Data d : arr){
-                        //String str = d.getName().toLowerCase().replaceAll("[ ]", "_").replaceAll("[')(]", "");
-                        int image_id = getResources().getIdentifier(PACKAGE_NAME+":drawable/" + d.getFilename(), null, null);
-                        String str = "rarity_" + String.valueOf(d.getRarity());
-                        int rarity_id = getResources().getIdentifier(PACKAGE_NAME+":drawable/" + str, null, null);
-                        collections.add(new Collection(d.getId(), d.getName(), image_id, d.getRarity(), rarity_id));
-                    }
-
                     Tab2Fragment tab2 = new Tab2Fragment();
-                    tab2.updateFragment(collections, viewPager);
+                    tab2.updateFragment(getCollection(viewPager), viewPager);
                     //Toast.makeText(viewPager.getContext(),PACKAGE_NAME,Toast.LENGTH_SHORT).show();
                     //Toast.makeText(viewPager.getContext(),"LOL",Toast.LENGTH_SHORT).show();
+                }
+
+                //On Overview page, make DB call to refresh skill chain.
+                if (position == 2) {
+                    Tab3Fragment tab3 = new Tab3Fragment();
+                    tab3.updateFragment(getCollection(viewPager), viewPager);
                 }
             }
 
@@ -148,6 +142,23 @@ public class Main2Activity extends AppCompatActivity {
             public void onPageScrollStateChanged(int state) {
             }
         });
+    }
+
+    public ArrayList<Collection> getCollection(ViewPager viewPager) {
+        DBHelper mydb;
+        ArrayList<Collection> collections;
+        mydb = new DBHelper(viewPager.getContext());
+        ArrayList<Data> list = mydb.getAllHeroes();
+        collections = new ArrayList<>();
+
+        for (Data d : list){
+            String filename = d.getName().toLowerCase().replaceAll("[ ]", "_").replaceAll("[')(+]", "");
+            int image_id = getResources().getIdentifier(PACKAGE_NAME+":drawable/" + filename, null, null);
+            String str = "rarity_" + String.valueOf(d.getRarity());
+            int rarity_id = getResources().getIdentifier(PACKAGE_NAME+":drawable/" + str, null, null);
+            collections.add(new Collection(d.getId(), d.getName(), image_id, d.getRarity(), rarity_id, d.getBoon(), d.getBane()));
+        }
+        return collections;
     }
 
     //Setups Fragment, don't change.

@@ -1,19 +1,13 @@
 package com.example.david.testapp;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.View.OnClickListener;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import java.util.ArrayList;
 
 /**
@@ -61,6 +55,8 @@ public class CollectionAdapter extends BaseAdapter{
 
         final ImageView imageView = (ImageView)convertView.findViewById(R.id.imageview_portrait);
         final ImageView imageViewFavorite = (ImageView)convertView.findViewById(R.id.imageview_rarity);
+        TextView hero_boon = (TextView) convertView.findViewById(R.id.hero_boon);
+        TextView hero_bane = (TextView) convertView.findViewById(R.id.hero_bane);
 
         imageView.setImageResource(collection.getImageResource());
         if ( collection.getRarity() == 5) {
@@ -72,6 +68,15 @@ public class CollectionAdapter extends BaseAdapter{
         }
         //nameTextView.setText(collection.getName());
         imageViewFavorite.setImageResource(collection.getRarityImage());
+
+        if (collection.getBoon().equals("Neutral")) {
+            hero_boon.setText("Neutral");
+            hero_boon.setTextColor(Color.GRAY);
+            hero_bane.setVisibility(View.GONE);
+        } else {
+            hero_boon.setText("+"+collection.getBoon().toUpperCase());
+            hero_bane.setText("-"+collection.getBane().toUpperCase());
+        }
 
         return convertView;
     }

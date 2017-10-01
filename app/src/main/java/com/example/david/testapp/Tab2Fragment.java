@@ -14,7 +14,7 @@ import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.Toast;
-
+import java.util.List;
 import java.util.ArrayList;
 
 import static com.example.david.testapp.Main2Activity.PACKAGE_NAME;
@@ -32,16 +32,6 @@ public class Tab2Fragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.tab2_fragment,container,false);
-
-        //button
-        btnTEST = (Button) view.findViewById(R.id.btnTEST2);
-
-        btnTEST.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(getActivity(), "TESTING BUTTON CLICK 2",Toast.LENGTH_SHORT).show();
-            }
-        });
 
         return view;
     }
@@ -65,14 +55,13 @@ public class Tab2Fragment extends Fragment {
                 mydb = new DBHelper(convertView.getContext());
                 d = mydb.getHeroDataById((int)id);
 
-                ImageView actionImage = (ImageView) convertView.findViewById(R.id.image_hero_action);
+                //ImageView actionImage = (ImageView) convertView.findViewById(R.id.image_hero_action);
                 try {
-                    String filename_special = d.getFilename() + "_special";
-                    int image_id = convertView.getResources().getIdentifier(PACKAGE_NAME + ":drawable/" + filename_special, null, null);
-                    actionImage.setImageResource(image_id);
+                    String filename_special = d.getName();
+                    //int image_id = convertView.getResources().getIdentifier(PACKAGE_NAME + ":drawable/" + filename_special, null, null);
+                    //actionImage.setImageResource(image_id);
                     Toast.makeText(convertView.getContext(), "SUCCESS: "+filename_special, Toast.LENGTH_SHORT).show();
                 } catch(Exception e) {
-                    String filename_special = d.getFilename() + "_special";
                     Toast.makeText(view.getContext(), "FAILED: "+e, Toast.LENGTH_LONG).show();
                 }
             }

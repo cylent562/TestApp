@@ -20,19 +20,25 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String HEROES_COLUMN_ID = "id";
     public static final String HEROES_COLUMN_NAME = "name";
     public static final String HEROES_COLUMN_RARITY = "rarity";
-    public static final String HEROES_COLUMN_FILENAME = "filename";
+    public static final String HEROES_COLUMN_BOON = "boon";
+    public static final String HEROES_COLUMN_BANE = "bane";
 
     private HashMap hp;
 
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, 1);
+        /*
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.close();
+        boolean ret = context.deleteDatabase("Collection.db");
+        */
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(
                 "create table heroes " +
-                        "(id integer primary key, name text,rarity integer, filename text)"
+                        "(id integer primary key, name text, rarity integer, boon text, bane text)"
         );
     }
 
@@ -42,12 +48,19 @@ public class DBHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+    public void deleteDB() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DROP TABLE IF EXISTS heroes");
+        onCreate(db);
+    }
+
     public boolean insertHero (Data d) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put("name", d.getName());
         contentValues.put("rarity", d.getRarity());
-        contentValues.put("filename", d.getFilename());
+        contentValues.put("boon", d.getBoon());
+        contentValues.put("bane", d.getBane());
         db.insert("heroes", null, contentValues);
         return true;
     }
@@ -71,7 +84,8 @@ public class DBHelper extends SQLiteOpenHelper {
     public Data getHeroDataById(int id) {
         Data d = null;
         String name = "";
-        String filename = "";
+        String boon = "";
+        String bane = "";
         int rarity = -1;
 
         SQLiteDatabase db = this.getReadableDatabase();
@@ -80,8 +94,9 @@ public class DBHelper extends SQLiteOpenHelper {
         while(res.isAfterLast() == false){
             name = res.getString(res.getColumnIndex(HEROES_COLUMN_NAME));
             rarity = res.getInt(res.getColumnIndex(HEROES_COLUMN_RARITY));
-            filename = res.getString(res.getColumnIndex(HEROES_COLUMN_FILENAME));
-            d = new Data(id, name, rarity, filename);
+            boon = res.getString(res.getColumnIndex(HEROES_COLUMN_BOON));
+            bane = res.getString(res.getColumnIndex(HEROES_COLUMN_BANE));
+            d = new Data(id, name, rarity, boon, bane);
             res.moveToNext();
         }
         return d;
@@ -91,7 +106,8 @@ public class DBHelper extends SQLiteOpenHelper {
     public ArrayList<Data> getAllHeroes() {
         ArrayList<Data> array_list = new ArrayList<>();
         String name = "";
-        String filename = "";
+        String boon = "";
+        String bane = "";
         int rarity = -1;
         int id = -1;
 
@@ -104,8 +120,9 @@ public class DBHelper extends SQLiteOpenHelper {
             name = res.getString(res.getColumnIndex(HEROES_COLUMN_NAME));
             rarity = res.getInt(res.getColumnIndex(HEROES_COLUMN_RARITY));
             id = res.getInt(res.getColumnIndex(HEROES_COLUMN_ID));
-            filename = res.getString(res.getColumnIndex(HEROES_COLUMN_FILENAME));
-            array_list.add(new Data(id, name, rarity, filename));
+            boon = res.getString(res.getColumnIndex(HEROES_COLUMN_BOON));
+            bane = res.getString(res.getColumnIndex(HEROES_COLUMN_BANE));
+            array_list.add(new Data(id, name, rarity, boon, bane));
             res.moveToNext();
         }
         return array_list;

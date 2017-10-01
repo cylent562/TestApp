@@ -7,6 +7,8 @@
     android:text="12"
     android:textAppearance="?android:attr/textAppearanceLarge"
     android:background="@drawable/image_circle_border"
+    android:textStyle="bold"
+    android:textColor="@color/colorPrimary"
     />
 
     <!--android:background="@drawable/image_circle_border"-->

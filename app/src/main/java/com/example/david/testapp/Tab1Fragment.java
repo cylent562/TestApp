@@ -22,9 +22,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 
 import static com.example.david.testapp.Main2Activity.HERO_DATA;
 import static com.example.david.testapp.Main2Activity.PACKAGE_NAME;
@@ -38,7 +40,6 @@ import static com.example.david.testapp.Main2Activity.HEROES;
 public class Tab1Fragment extends Fragment {
     private static final String TAG = "Tab1Fragment";
 
-    //String[] Heroes = {"Athena","Boey","Caeda (Bridal)","Charlotte (Bridal)","Clarisse","Cordelia (Bridal)","Katarina","Legion","Luke","Lyn (Bridal)","Mae","Marth (Masked)","Roderick","Genny","Alfonse","Anna","Sharena","Virion","Tiki (Adult)","Tiki (Young)","Alm","Chrom","Corrin (M)","Eirika","Fir","Hana","Hinata","Ike","Karel","Laslow","Lloyd","Lon'qu","Lucina","Lyn","Marth","Navarre","Ogma","Olivia","Roy","Ryoma","Selena","Seliph","Caeda","Palla","Cain","Eldigan","Eliwood","Stahl","Xander","Draug","Zephiel","Henry","Lilina","Raigh","Sanaki","Sophia","Tharja","Leo","Arthur","Barst","Bartre","Chrom (Spring Festival)","Hawkeye","Raven","Beruka","Camilla","Cherche","Michalis","Minerva","Narcian","Frederick","Gunter","Titania","Hector","Sheena","Fae","Julia","Merric","Nino","Robin (F)","Soren","Veronica","Camilla (Spring Festival)","Cecilia","Corrin (F)","Ninian","Nowi","Azura","Donnel","Ephraim","Lukas","Oboro","Catria","Clair","Cordelia","Est","Florina","Hinoka","Shanna","Subaki","Abel","Camus","Jagen","Peri","Sully","Xander (Spring Festival)","Effie","Gwendolyn","Linde","Lucina (Spring Festival)","Odin","Robin (M)","Bruno","Olwen","Reinhardt","Ursula","Faye","Gordin","Jeorge","Klein","Niles","Rebecca","Setsuna","Takumi","Felicia","Gaius","Jaffar","Jakob","Kagero","Matthew","Saizo","Azama","Lachesis","Lissa","Lucius","Maria","Mist","Sakura","Serra","Wrys","Clarine","Elise","Priscilla"};
     Integer[] Rarities = {R.drawable.rarity_3, R.drawable.rarity_4, R.drawable.rarity_5};
 
     DropdownAdapter adapter = null;
@@ -64,6 +65,7 @@ public class Tab1Fragment extends Fragment {
         final DropdownAdapter adapter = new DropdownAdapter(getContext(), populateItemData("5 Stars"));
         spin_hero.setAdapter(adapter);
 
+
         //set rarities dropdown
         final Spinner spin_rarity = (Spinner) view.findViewById(R.id.spinner2);
         spin_rarity.getBackground().setColorFilter(ContextCompat.getColor(getContext(),android.R.color.black), PorterDuff.Mode.SRC_ATOP);
@@ -78,27 +80,39 @@ public class Tab1Fragment extends Fragment {
                 Spinner spin_hero = (Spinner) main.findViewById(R.id.spinner);
                 DropdownAdapter adapter = (DropdownAdapter) spin_hero.getAdapter();
                 String name = adapter.getItem(spin_hero.getSelectedItemPosition()).getName();
-
                 set_hero_dropdown(main, rarity, name);
             }
             public void onNothingSelected(AdapterView<?> parent) {}
         });
 
         //Add button
+
         FloatingActionButton btn =  (FloatingActionButton) view.findViewById(R.id.floatingActionButton);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //View main = v.getRootView();
-                //Spinner spin_hero = (Spinner) main.findViewById(R.id.spinner);
-                //DropdownAdapter adapter = (DropdownAdapter) spin_hero.getAdapter();
+                View main = v.getRootView();
+                Spinner spin_hero = (Spinner) main.findViewById(R.id.spinner);
+                DropdownAdapter adapter = (DropdownAdapter) spin_hero.getAdapter();
                 String name = adapter.getItem(spin_hero.getSelectedItemPosition()).getName();
                 String rarity = adapter2.getItem(spin_rarity.getSelectedItemPosition()).getName();
                 int value = Character.getNumericValue(rarity.charAt(0));
-                String filename = name.toLowerCase().replaceAll("[ ]", "_").replaceAll("[')(]", "");
-                mydb = new DBHelper(getContext());
-                mydb.insertHero(new Data(-1, name, value, filename));
-                Toast.makeText(getContext(),"Added " + name,Toast.LENGTH_SHORT).show();
+                String filename = name.toLowerCase().replaceAll("[ ]", "_").replaceAll("[')(+]", "");
+                //text.toLowerCase().replaceAll("[ ]", "_").replaceAll("[')(+]", "");
+                HashMap<String,String> stat_map = getStatBoonBane(main);
+                String boon = stat_map.get("boon");
+                String bane = stat_map.get("bane");
+
+                if (boon.equals("Neutral") && !bane.equals("Neutral")){
+                    Toast.makeText(getContext(),"Please add a plus stat!",Toast.LENGTH_SHORT).show();
+                } else if(!boon.equals("Neutral") && bane.equals("Neutral")) {
+                    Toast.makeText(getContext(),"Please add a minus stat!",Toast.LENGTH_SHORT).show();
+                } else {
+                    //Toast.makeText(getContext(),"+" + boon + " -" + bane,Toast.LENGTH_SHORT).show();
+                    mydb = new DBHelper(getContext());
+                    mydb.insertHero(new Data(-1, name, value, boon, bane));
+                    Toast.makeText(getContext(),"Added " + name,Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -127,6 +141,26 @@ public class Tab1Fragment extends Fragment {
         });
     }
 
+    private HashMap<String, String> getStatBoonBane(View view) {
+        HashMap<String, String> map = new HashMap<>();
+        String[] stats = new String[] {"hp","atk","spd","def","res"};
+        map.put("boon", "Neutral");
+        map.put("bane", "Neutral");
+        for (int i = 0; i < stats.length; i++) {
+            int resID = view.getResources().getIdentifier(stats[i]+"_max","id",PACKAGE_NAME);
+            TextView stat_text = (TextView) view.findViewById(resID);
+            String[] tag = (String[]) stat_text.getTag();
+            if ( tag == null) {
+                return null;
+            }
+            if ( tag[1].equals("2")) { //boon
+                map.put("boon", tag[0]);
+            } else if (tag[1].equals("0")) { //bane
+                map.put("bane", tag[0]);
+            }
+        }
+        return map;
+    }
 
     private void displayHeroInfo(View view){
         Spinner spin_hero = (Spinner) view.findViewById(R.id.spinner);
@@ -136,21 +170,21 @@ public class Tab1Fragment extends Fragment {
         String name = temp1.getItem(spin_hero.getSelectedItemPosition()).getName();
         String rarity = temp2.getItem(spin_rarity.getSelectedItemPosition()).getName();
 
-
-        Spinner hp_init = (Spinner) view.findViewById(R.id.spinner_hp);
-        TextView hp_max = (TextView) view.findViewById(R.id.hp_max);
-        Spinner atk_init = (Spinner) view.findViewById(R.id.spinner_atk);
-        TextView atk_max = (TextView) view.findViewById(R.id.atk_max);
-        Spinner spd_init = (Spinner) view.findViewById(R.id.spinner_spd);
-        TextView spd_max = (TextView) view.findViewById(R.id.spd_max);
-        Spinner def_init = (Spinner) view.findViewById(R.id.spinner_def);
-        TextView def_max = (TextView) view.findViewById(R.id.def_max);
-        Spinner res_init = (Spinner) view.findViewById(R.id.spinner_res);
-        TextView res_max = (TextView) view.findViewById(R.id.res_max);
+        Spinner hp_spinner = (Spinner) view.findViewById(R.id.spinner_hp);
+        TextView hp_text = (TextView) view.findViewById(R.id.hp_max);
+        Spinner atk_spinner = (Spinner) view.findViewById(R.id.spinner_atk);
+        TextView atk_text = (TextView) view.findViewById(R.id.atk_max);
+        Spinner spd_spinner = (Spinner) view.findViewById(R.id.spinner_spd);
+        TextView spd_text = (TextView) view.findViewById(R.id.spd_max);
+        Spinner def_spinner = (Spinner) view.findViewById(R.id.spinner_def);
+        TextView def_text = (TextView) view.findViewById(R.id.def_max);
+        Spinner res_spinner = (Spinner) view.findViewById(R.id.spinner_res);
+        TextView res_text = (TextView) view.findViewById(R.id.res_max);
 
         ImageView move = (ImageView) view.findViewById(R.id.icon_move);
         ImageView weapon_type = (ImageView) view.findViewById(R.id.icon_weapon_type);
         TextView rating = (TextView) view.findViewById(R.id.hero_rating);
+        TextView hero_title = (TextView) view.findViewById(R.id.hero_title);
 
         TextView weapon_name = (TextView) view.findViewById(R.id.icon_weapon_name);
         TextView assist_name = (TextView) view.findViewById(R.id.icon_assist_name);
@@ -162,19 +196,19 @@ public class Tab1Fragment extends Fragment {
         TextView passiveB_name = (TextView) view.findViewById(R.id.icon_passiveB_name);
         TextView passiveC_name = (TextView) view.findViewById(R.id.icon_passiveC_name);
 
-
         try {
             JSONArray init_stats = HERO_DATA.getJSONObject(name).getJSONArray("stats_"+rarity.charAt(0)).getJSONArray(0);
             JSONArray max_stats = HERO_DATA.getJSONObject(name).getJSONArray("stats_"+rarity.charAt(0)).getJSONArray(1);
             String hero_move = HERO_DATA.getJSONObject(name).getString("move").toLowerCase();
             String hero_weapon_type = HERO_DATA.getJSONObject(name).getString("weapon_type").toLowerCase();
             String hero_color = HERO_DATA.getJSONObject(name).getString("color").toLowerCase();
-            String hero_passiveA = parseTextToDrawable(HERO_DATA.getJSONObject(name), "passiveA");
-            String hero_passiveB = parseTextToDrawable(HERO_DATA.getJSONObject(name), "passiveB");
-            String hero_passiveC = parseTextToDrawable(HERO_DATA.getJSONObject(name), "passiveC");
-            String weapon_text = parseTextToDrawable(HERO_DATA.getJSONObject(name), "weapon");
-            String assist_text = parseTextToDrawable(HERO_DATA.getJSONObject(name), "assist");
-            String special_text = parseTextToDrawable(HERO_DATA.getJSONObject(name), "special");
+            String hero_passiveA = parseJSONToDrawable(HERO_DATA.getJSONObject(name), "passiveA");
+            String hero_passiveB = parseJSONToDrawable(HERO_DATA.getJSONObject(name), "passiveB");
+            String hero_passiveC = parseJSONToDrawable(HERO_DATA.getJSONObject(name), "passiveC");
+            String weapon_text = parseJSONToDrawable(HERO_DATA.getJSONObject(name), "weapon");
+            String assist_text = parseJSONToDrawable(HERO_DATA.getJSONObject(name), "assist");
+            String special_text = parseJSONToDrawable(HERO_DATA.getJSONObject(name), "special");
+            String hero_title_text = HERO_DATA.getJSONObject(name).getString("title");
 
             String weapon_icon = "icon_class_"+ hero_color + "_" + hero_weapon_type;
             String move_icon = "icon_move_" + hero_move;
@@ -191,11 +225,11 @@ public class Tab1Fragment extends Fragment {
             String max_def = max_stats.getString(3);
             String max_res = max_stats.getString(4);
 
-            setStats(hp, max_hp, hp_init, hp_max, "hp");
-            setStats(atk, max_atk, atk_init, atk_max, "atk");
-            setStats(spd, max_spd, spd_init, spd_max, "spd");
-            setStats(def, max_def, def_init, def_max, "def");
-            setStats(res, max_res, res_init, res_max, "res");
+            setStats(hp, max_hp, hp_spinner, hp_text, "hp");
+            setStats(atk, max_atk, atk_spinner, atk_text, "atk");
+            setStats(spd, max_spd, spd_spinner, spd_text, "spd");
+            setStats(def, max_def, def_spinner, def_text, "def");
+            setStats(res, max_res, res_spinner, res_text, "res");
 
             setIcon(view, move, move_icon);
             setIcon(view, weapon_type, weapon_icon);
@@ -233,16 +267,14 @@ public class Tab1Fragment extends Fragment {
                 setIcon(view, passiveC_icon, hero_passiveC);
             }
 
-
-
-
+            hero_title.setText(hero_title_text);
 
         } catch(Exception e) {
             e.printStackTrace();
         }
     }
 
-    private String parseTextToDrawable(JSONObject ob, String key){
+    private String parseJSONToDrawable(JSONObject ob, String key){
         try {
             if (ob.has(key)) {
                 String text = ob.getString(key);
@@ -260,48 +292,63 @@ public class Tab1Fragment extends Fragment {
         img.setImageResource(image_id);
     }
 
-    private void setStats(String initStat, String maxStat, Spinner spin, TextView text, String tag){
+    private void setStats(String initStat, String maxStat, Spinner spin, TextView text, String stat_type){
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(getContext(), R.layout.spinner_item, buildStatVariance(Integer.parseInt(initStat)));
         dataAdapter.setDropDownViewResource(R.layout.spinner_item);
         spin.setAdapter(dataAdapter);
         spin.setSelection(1);
         int max = Integer.parseInt(maxStat);
-        String[] memory = new String[]{tag, String.valueOf(max-3), String.valueOf(max), String.valueOf(max+3)};
+        String[] memory = new String[]{String.valueOf(max-3), String.valueOf(max), String.valueOf(max+3), stat_type};
         spin.setTag(memory);
         text.setText(maxStat);
+
         spin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
             {
-                //String selectedItem = parent.getItemAtPosition(position).toString();
+
                 View main = view.getRootView();
                 String[] tag = (String[]) parent.getTag();
+
+                //Integer[] colors = new Integer[]{Color.parseColor("#ff00ff"), Color.BLACK, Color.parseColor("#000e500")};
                 Integer[] colors = new Integer[]{Color.RED, Color.BLACK, Color.GREEN};
+
                 if(main != null) {
-                    switch(tag[0]) {
+                    TextView hp = (TextView) main.findViewById(R.id.hp_max);
+                    TextView atk = (TextView) main.findViewById(R.id.atk_max);
+                    TextView spd = (TextView) main.findViewById(R.id.spd_max);
+                    TextView def = (TextView) main.findViewById(R.id.def_max);
+                    TextView res = (TextView) main.findViewById(R.id.res_max);
+
+                    switch(tag[3]) {
                         case "hp":
-                            TextView hp_max = (TextView) main.findViewById(R.id.hp_max);
-                            hp_max.setText(tag[position+1]);
-                            hp_max.setTextColor(colors[position]);
+                            String[] map1 = new String[] { "hp", String.valueOf(position)};
+                            updateStats(hp, tag[position], colors[position], map1);
+                            TextView[] temp1 = new TextView[] {atk,spd,def,res};
+                            verifyStats(temp1, main, String.valueOf(position));
                             break;
                         case "atk":
-                            TextView atk = (TextView) main.findViewById(R.id.atk_max);
-                            atk.setText(tag[position+1]);
-                            atk.setTextColor(colors[position]);
+                            String[] map2 = new String[] { "atk", String.valueOf(position)};
+                            updateStats(atk, tag[position], colors[position], map2);
+                            TextView[] temp2 = new TextView[] {hp,spd,def,res};
+                            verifyStats(temp2, main, String.valueOf(position));
                             break;
                         case "spd":
-                            TextView spd = (TextView) main.findViewById(R.id.spd_max);
-                            spd.setText(tag[position+1]);
-                            spd.setTextColor(colors[position]);
+                            String[] map3 = new String[] { "spd", String.valueOf(position)};
+                            updateStats(spd, tag[position], colors[position], map3);
+                            TextView[] temp3 = new TextView[] {hp,atk,def,res};
+                            verifyStats(temp3, main, String.valueOf(position));
                             break;
                         case "def":
-                            TextView def = (TextView) main.findViewById(R.id.def_max);
-                            def.setText(tag[position+1]);
-                            def.setTextColor(colors[position]);
+                            String[] map4 = new String[] { "def", String.valueOf(position)};
+                            updateStats(def, tag[position], colors[position], map4);
+                            TextView[] temp4 = new TextView[] {hp,spd,atk,res};
+                            verifyStats(temp4, main, String.valueOf(position));
                             break;
                         case "res":
-                            TextView res = (TextView) main.findViewById(R.id.res_max);
-                            res.setText(tag[position+1]);
-                            res.setTextColor(colors[position]);
+                            String[] map5 = new String[] { "res", String.valueOf(position)};
+                            updateStats(res, tag[position], colors[position], map5);
+                            TextView[] temp5 = new TextView[] {hp,spd,def,atk};
+                            verifyStats(temp5, main, String.valueOf(position));
                             break;
                         default:
                             break;
@@ -310,6 +357,34 @@ public class Tab1Fragment extends Fragment {
             }
             public void onNothingSelected(AdapterView<?> parent) {}
         });
+    }
+
+    private void updateStats(TextView stat_object, String text, int color, String[] map) {
+        stat_object.setText(text);
+        stat_object.setTextColor(color);
+        stat_object.setTag(map);
+    }
+
+    private void verifyStats(TextView[] arr, View view, String position) {
+        try {
+            for (int i = 0; i < arr.length; i++) {
+                String[] tag = (String[]) arr[i].getTag();
+                if (tag == null) {
+                    continue;
+                }
+                if (tag[1].equals("2") && position.equals("2")) { //boon
+                    int resID = view.getResources().getIdentifier("spinner_"+ tag[0], "id", PACKAGE_NAME);
+                    Spinner spin = (Spinner) view.findViewById(resID);
+                    spin.setSelection(1);
+                } else if (tag[1].equals("0") && position.equals("0")) { //bane
+                    int resID = view.getResources().getIdentifier("spinner_" + tag[0], "id", PACKAGE_NAME);
+                    Spinner spin = (Spinner) view.findViewById(resID);
+                    spin.setSelection(1);
+                }
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private ArrayList<String> buildStatVariance(int num) {
@@ -340,7 +415,7 @@ public class Tab1Fragment extends Fragment {
 
     private int findImageMatch(String name) {
         try {
-            String s = name.toLowerCase().replaceAll("[ ]", "_").replaceAll("[')(]", "");
+            String s = name.toLowerCase().replaceAll("[ ]", "_").replaceAll("[')(+]", "");
             int id = getResources().getIdentifier(PACKAGE_NAME+":drawable/" + s, null, null);
             return id;
         } catch (Exception e) {

@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-/*
 
+/*
 class SectionsPageAdapter extends FragmentPagerAdapter {
 
     private final List<Fragment> mFragmentList = new ArrayList<>();
@@ -62,5 +62,4 @@ class SectionsPageAdapter extends FragmentPagerAdapter {
         return mFragmentList.size();
     }
 }
-
 */
